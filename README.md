@@ -1,19 +1,6 @@
 Albion Online Market Tracker
 ===================
 
-## App preview
-
-![0.7.0](https://user-images.githubusercontent.com/11301109/71000581-d9124000-20db-11ea-8c19-4d7f69a2c155.png)
-
-## Youtube live preview
-
-[![Video](http://img.youtube.com/vi/Dy3YyherSmw/0.jpg)](http://www.youtube.com/watch?v=Dy3YyherSmw "Albion online stats")
-
-
-# How to use this app
-
-> **Note** this section does not require any coding knowledge. Those simple two steps are required to use this software :)
-
 ## Installation
 
 1. Install python [all platforms installation instructions](https://docs.python.org/3/using/) or via [Microsoft Store](https://www.microsoft.com/en-us/p/python-39/9p7qfqmjrfp7).
