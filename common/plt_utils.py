@@ -84,7 +84,7 @@ def plot_one_city(
         quality_name = 'Masterpiece'
     ax2.set_ylabel("item count", color="blue", fontsize=14)
     plt.title(item + ' ' + quality_name + ' quality at ' + city)
-    plt.show()
+    plt.show(block=False)
 
 def plot_all_cities(
     df_all: pd.DataFrame,
@@ -171,23 +171,24 @@ def plot_all_cities(
             print(e)
 
     ax2.legend(loc='upper left',
-        title='avg prices and item counts')
-    l1 = ax.legend(handles = tuple_list,
-        labels=royal_cities,
-        loc='upper left',
-        title='avg prices and item counts', 
-        handler_map={tuple: HandlerTuple(None)}
-    )
+        title='Colors')
+    # l1 = ax.legend(handles = tuple_list,
+    #     labels=royal_cities,
+    #     loc='upper left',
+    #     title='avg prices and item counts', 
+    #     handler_map={tuple: HandlerTuple(None)}
+    # )
     
-    ax.add_artist(l1)
+    # ax.add_artist(l1)
 
-    ax.legend(handles = tuple_list2,
-        labels=royal_cities,
-        loc='upper right',
-        title='current prices',
-        shadow=True,
-        handler_map={tuple: HandlerTuple(None)}
-    )
+    # ax.legend(handles = tuple_list2,
+    #     labels=royal_cities,
+    #     loc='upper right',
+    #     title='current prices',
+    #     shadow=True,
+    #     bbox_to_anchor=(0.2, 1),
+    #     handler_map={tuple: HandlerTuple(None)}
+    # )
 
     if quality == 1:
         quality_name = 'Normal'
@@ -201,4 +202,4 @@ def plot_all_cities(
         quality_name = 'Masterpiece'
     
     plt.title('{} days of '.format(no_days) + item + ' ' + quality_name + ' quality')
-    plt.show()
+    plt.show(block=False)

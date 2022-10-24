@@ -2,7 +2,8 @@ from common.history_utils import *
 from common.prices_utils import *
 
 from common.plt_utils import * 
-
+import sys
+import os
 # TO-DO LIST 
 # 0. Flipping
     # Get the average market price for 1 week, calculate the daily item_count
@@ -21,13 +22,16 @@ from common.plt_utils import *
 
 URL_NAME = "https://www.albion-online-data.com/api/v2/stats/"
 
-item_name = ["T4_ORE", "T4_ORE_LEVEL1@1", "T4_ORE_LEVEL2@2", "T4_ORE_LEVEL3@3"]
+#item_name = ["T7_ORE", "T7_METALBAR"]
 royal_cities = ['Thetford', 'Lymhurst', 'Bridgewatch', 'Martlock', 'Fort Sterling']
-qualities = [1,2,3,4,5]
+#qualities = [1,2,3,4,5]
+os.startfile("items\\items.txt")
+item_name = [input('Enter the item:')]
+#qualities = input('Enter the qualities:')
 df_raw_history, df_all_history = process_history_data(
     item_name,
     royal_cities,
-    qualities,
+    quality_list=[1],
     avg_days=14
 )
 
@@ -35,7 +39,19 @@ city_and_portals = add_portals(royal_cities)
 df_all_prices = get_prices_data(item_name, city_and_portals)
 
 df_all = pd.merge(df_all_history, df_all_prices, how='outer')
-plot_one_city(df_all, item_name[1], royal_cities[0], quality=1, no_days=14)
-plot_all_cities(df_all, item_name[1], royal_cities, quality=1, no_days=28)
+plot_all_cities(df_all, item_name[0], royal_cities, quality=1, no_days=28)
+
+while 1:
+    plot_city = int(input('Enter the id (1: Thetford, 2: Lymhurst, 3: Bridgewatch, 4: Martlock, 5: Fort Sterling, 0: Exit): '))
+
+    if plot_city == 0:
+        sys.exit()
+    elif (plot_city > 0 and plot_city < 6): 
+        plot_city = plot_city - 1
+    else:
+        print('Try again')
+        continue
+    plot_one_city(df_all, item_name[0], royal_cities[plot_city], quality=1, no_days=14)
+
 breakpointt = 1
 
