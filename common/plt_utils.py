@@ -170,8 +170,7 @@ def plot_all_cities(
         except Exception as e:
             print(e)
 
-    ax2.legend(loc='upper left',
-        title='Colors')
+    ax2.legend(loc='upper left')
     # l1 = ax.legend(handles = tuple_list,
     #     labels=royal_cities,
     #     loc='upper left',
@@ -202,4 +201,6 @@ def plot_all_cities(
         quality_name = 'Masterpiece'
     
     plt.title('{} days of '.format(no_days) + item + ' ' + quality_name + ' quality')
-    plt.show(block=False)
+    # plt.show(block=False)
+    return fig
+
