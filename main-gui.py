@@ -1,5 +1,6 @@
 import flet
 from flet import Container, Page, Row, Text, alignment, colors, Dropdown, dropdown
+from flet import Column
 import pandas as pd
 
 
@@ -16,6 +17,7 @@ class MyDataframes:
         self.df = pd.read_json('items\item_categories.json')
         self.df2 = pd.DataFrame()
         self.df_all = pd.DataFrame()
+        self.df_all_prices = pd.DataFrame()
 
 matplotlib.use("svg")
 
@@ -50,6 +52,9 @@ def main(page: Page):
         options=[],
     )
 
+    out_text = Text()
+    out_text2 = Text()
+
     def get_category(e):
         category = color_dropdown.value
         idx = df.index[df['text'] == category].tolist()[0]
@@ -59,6 +64,8 @@ def main(page: Page):
         page.update()
 
     def get_item(e):
+        out_text.value = 'Wait for Processing'
+        page.update()
         subcategory = color_dropdown2.value
         idx = mydf.df2.index[mydf.df2['text'] == subcategory].tolist()[0]
         href = mydf.df2.iloc[idx]['href']
@@ -73,8 +80,9 @@ def main(page: Page):
             avg_days=14
         )
 
-        df_all_prices = get_prices_data(item_list, city_and_portals)
-        mydf.df_all = pd.merge(df_all_history, df_all_prices, how='outer')
+        mydf.df_all_prices = get_prices_data(item_list, city_and_portals)
+        mydf.df_all = pd.merge(df_all_history, mydf.df_all_prices, how='outer')
+        out_text.value = 'You can continue'
         page.update()
 
     def button_clicked(e):
@@ -83,57 +91,89 @@ def main(page: Page):
         fig = plot_all_cities(mydf.df_all, item_name, royal_cities, quality=1, no_days=28)
         charts1.figure = fig
         charts1.visible = True
+        out_text.value = 'Wait for new Resource type'
+        out_text2.value = str(mydf.df_all_prices[mydf.df_all_prices['item_id']==item_name])
         page.update()
 
     page.add(
-        Row(
-            [
-                Container(
-                    content=color_dropdown,
-                    margin=10,
-                    padding=10,
-                    alignment=alignment.center,
-                    bgcolor=colors.AMBER,
-                    width=150,
-                    height=150,
-                    border_radius=10,
-                    on_click=get_category,
+        Column(
+                [
+                Row(
+                    [
+                        Container(
+                            content=color_dropdown,
+                            margin=10,
+                            padding=10,
+                            alignment=alignment.center,
+                            bgcolor=colors.AMBER,
+                            width=150,
+                            height=150,
+                            border_radius=10,
+                            on_click=get_category,
+                        ),
+                        Container(
+                            content=color_dropdown2,
+                            margin=10,
+                            padding=10,
+                            alignment=alignment.center,
+                            bgcolor=colors.GREEN_200,
+                            width=150,
+                            height=150,
+                            border_radius=10,
+                            on_click=get_item,
+                        ),
+                        Container(
+                            content=color_dropdown3,
+                            margin=10,
+                            padding=10,
+                            alignment=alignment.center,
+                            bgcolor=colors.BLUE_200,
+                            width=150,
+                            height=150,
+                            border_radius=10,
+                            on_click=button_clicked,
+                        ),
+                        Container(
+                            content=charts1,
+                            margin=10,
+                            padding=10,
+                            alignment=alignment.center,
+                            bgcolor=colors.BLUE_200,
+                            width=600,
+                            height=480,
+                            border_radius=10,
+                        ),
+                    ],
+                    alignment="center",
                 ),
-                Container(
-                    content=color_dropdown2,
-                    margin=10,
-                    padding=10,
-                    alignment=alignment.center,
-                    bgcolor=colors.GREEN_200,
-                    width=150,
-                    height=150,
-                    border_radius=10,
-                    on_click=get_item,
-                ),
-                Container(
-                    content=color_dropdown3,
-                    margin=10,
-                    padding=10,
-                    alignment=alignment.center,
-                    bgcolor=colors.BLUE_200,
-                    width=150,
-                    height=150,
-                    border_radius=10,
-                    on_click=button_clicked,
-                ),
-                Container(
-                    content=charts1,
-                    margin=10,
-                    padding=10,
-                    alignment=alignment.center,
-                    bgcolor=colors.BLUE_200,
-                    width=600,
-                    height=480,
-                    border_radius=10,
+                Row(
+                    [
+                        Container(
+                            content=out_text,
+                            margin=10,
+                            padding=10,
+                            alignment=alignment.center,
+                            width=450,
+                            height=150,
+                            border_radius=10,
+                        ),
+                        Container(
+                            content=out_text2,
+                            margin=10,
+                            padding=10,
+                            alignment=alignment.center,
+                            width=600,
+                            height=150,
+                            border_radius=10,
+                        ),
+                    ],
+                    alignment="center",
                 ),
             ],
-            alignment="center",
-        ),
+            
+
+        )
+        
     )
 
 flet.app(target=main)

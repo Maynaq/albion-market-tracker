@@ -140,7 +140,9 @@ def data_to_df(
 
     if df.loc[idx,:][data_key:data_key].isnull().all():
         # typing is problematic
-        return pd.DataFrame(columns=['item_count','avg_price','timestamp'])
+        return  pd.DataFrame({'item_count': pd.Series(dtype='int64'),
+                   'avg_price': pd.Series(dtype='int64'),
+                   'timestamp': pd.Series(dtype='datetime64[ns]')})
     else:
         return df.loc[idx, data_key].copy()
 

@@ -7,7 +7,17 @@ import pandas as pd
 
 albion_url = 'https://www.albiononline2d.com'
 
-def get_itemlist(href):
+def get_itemlist(href: str) -> list:
+    """Extract a list of items from a webpage specified by the `href` parameter.
+
+    Args:
+        href: The relative URL of the webpage to scrape.
+
+    Returns:
+        items_list: A list of items extracted from the webpage.
+    """
+
+
     url = albion_url + href
     soup = BeautifulSoup(requests.get(url).content, 'html.parser')
 
@@ -16,6 +26,8 @@ def get_itemlist(href):
     t = re.search(r'var config = (\{.*\});', s.text)[1]
     items = json.loads(t)['itemsForMarketData']
     items_list = items.split(',')
+    #  
+    items_list = [s.replace('@0', '') for s in items_list]
     return items_list    
 
 def update_categories(): 
