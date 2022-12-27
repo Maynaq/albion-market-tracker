@@ -86,6 +86,8 @@ def plot_one_city(
     plt.title(item + ' ' + quality_name + ' quality at ' + city)
     plt.show(block=False)
 
+    return fig
+
 def plot_all_cities(
     df_all: pd.DataFrame,
     item: str,

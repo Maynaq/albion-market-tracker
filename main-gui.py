@@ -24,19 +24,20 @@ matplotlib.use("svg")
 URL_NAME = "https://www.albion-online-data.com/api/v2/stats/"
 
 royal_cities = ['Thetford', 'Lymhurst', 'Bridgewatch', 'Martlock', 'Fort Sterling']
-item_name = ["T7_ORE"]
 
 city_and_portals = add_portals(royal_cities)
 
 def main(page: Page):
-    page.title = "Containers - clickable and not"
+    page.title = "Albion Market Prices"
     page.horizontal_alignment = "center"
     page.vertical_alignment = "center"
 
     mydf = MyDataframes()
-    fig, ax = plt.subplots()
+    fig, _ = plt.subplots()
     charts1 = MatplotlibChart(fig, expand=True, visible=False)
-
+    fig2, _ = plt.subplots()
+    charts2 = MatplotlibChart(fig2, expand=True, visible=False)
+    
     color_dropdown = Dropdown(
         width=100,
         options=[dropdown.Option(item) for item in df['text']],
@@ -52,6 +53,10 @@ def main(page: Page):
         options=[],
     )
 
+    color_dropdown4 = Dropdown(
+        width=100,
+        options=[],
+    )
     out_text = Text()
     out_text2 = Text()
 
@@ -93,87 +98,118 @@ def main(page: Page):
         charts1.visible = True
         out_text.value = 'Wait for new Resource type'
         out_text2.value = str(mydf.df_all_prices[mydf.df_all_prices['item_id']==item_name])
+        color_dropdown4.options = [dropdown.Option(item) for item in royal_cities]
+
         page.update()
 
-    page.add(
-        Column(
-                [
-                Row(
-                    [
-                        Container(
-                            content=color_dropdown,
-                            margin=10,
-                            padding=10,
-                            alignment=alignment.center,
-                            bgcolor=colors.AMBER,
-                            width=150,
-                            height=150,
-                            border_radius=10,
-                            on_click=get_category,
-                        ),
-                        Container(
-                            content=color_dropdown2,
-                            margin=10,
-                            padding=10,
-                            alignment=alignment.center,
-                            bgcolor=colors.GREEN_200,
-                            width=150,
-                            height=150,
-                            border_radius=10,
-                            on_click=get_item,
-                        ),
-                        Container(
-                            content=color_dropdown3,
-                            margin=10,
-                            padding=10,
-                            alignment=alignment.center,
-                            bgcolor=colors.BLUE_200,
-                            width=150,
-                            height=150,
-                            border_radius=10,
-                            on_click=button_clicked,
-                        ),
-                        Container(
-                            content=charts1,
-                            margin=10,
-                            padding=10,
-                            alignment=alignment.center,
-                            bgcolor=colors.BLUE_200,
-                            width=600,
-                            height=480,
-                            border_radius=10,
-                        ),
-                    ],
-                    alignment="center",
-                ),
-                Row(
-                    [
-                        Container(
-                            content=out_text,
-                            margin=10,
-                            padding=10,
-                            alignment=alignment.center,
-                            width=450,
-                            height=150,
-                            border_radius=10,
-                        ),
-                        Container(
-                            content=out_text2,
-                            margin=10,
-                            padding=10,
-                            alignment=alignment.center,
-                            width=600,
-                            height=150,
-                            border_radius=10,
-                        ),
-                    ],
-                    alignment="center",
-                ),
-            ],
-            
+    def button_clicked2(e):
+        plot_city = color_dropdown4.value
+        item_name = color_dropdown3.value
+        fig2 = plot_one_city(mydf.df_all, item_name, plot_city, quality=1, no_days=14)
+        charts2.figure = fig2
+        charts2.visible = True
+        page.update()
 
-        )
-        
+
+    Row1 = Row(
+        [
+            Container(
+                content=color_dropdown,
+                margin=10,
+                padding=10,
+                alignment=alignment.center,
+                bgcolor=colors.AMBER,
+                width=150,
+                height=150,
+                border_radius=10,
+                on_click=get_category,
+            ),
+            Container(
+                content=color_dropdown2,
+                margin=10,
+                padding=10,
+                alignment=alignment.center,
+                bgcolor=colors.GREEN_200,
+                width=150,
+                height=150,
+                border_radius=10,
+                on_click=get_item,
+            ),
+            Container(
+                content=color_dropdown3,
+                margin=10,
+                padding=10,
+                alignment=alignment.center,
+                bgcolor=colors.BLUE_200,
+                width=150,
+                height=150,
+                border_radius=10,
+                on_click=button_clicked,
+            ),
+            Container(
+                content=color_dropdown4,
+                margin=10,
+                padding=10,
+                alignment=alignment.center,
+                bgcolor=colors.BLUE_200,
+                width=150,
+                height=150,
+                border_radius=10,
+                on_click=button_clicked2,
+            ),
+        ],
+        alignment="center",
     )
+    Row2= Row(
+        [
+            Container(
+                content=charts1,
+                margin=10,
+                padding=10,
+                alignment=alignment.center,
+                bgcolor=colors.BLUE_200,
+                width=600,
+                height=480,
+                border_radius=10,
+            ),
+            Container(
+                content=charts2,
+                margin=10,
+                padding=10,
+                alignment=alignment.center,
+                bgcolor=colors.BLUE_200,
+                width=600,
+                height=480,
+                border_radius=10,
+            ),
+        ],
+        alignment="center",
+    )
+
+    Row3 = Row(
+        [
+            Container(
+                content=out_text,
+                margin=10,
+                padding=10,
+                alignment=alignment.center,
+                width=450,
+                height=150,
+                border_radius=10,
+            ),
+            Container(
+                content=out_text2,
+                margin=10,
+                padding=10,
+                alignment=alignment.center,
+                width=600,
+                height=150,
+                border_radius=10,
+            ),
+        ],
+        alignment="center"
+    )
+
+    page.add(Column([Row1, Row2, Row3]))         
 
 flet.app(target=main)
