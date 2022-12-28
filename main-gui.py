@@ -25,12 +25,11 @@ URL_NAME = "https://www.albion-online-data.com/api/v2/stats/"
 
 royal_cities = ['Thetford', 'Lymhurst', 'Bridgewatch', 'Martlock', 'Fort Sterling']
 
-city_and_portals = add_portals(royal_cities)
-
 def main(page: Page):
     page.title = "Albion Market Prices"
     page.horizontal_alignment = "center"
     page.vertical_alignment = "center"
+    page.window_maximized = True
 
     mydf = MyDataframes()
     fig, _ = plt.subplots()
@@ -38,28 +37,6 @@ def main(page: Page):
     fig2, _ = plt.subplots()
     charts2 = MatplotlibChart(fig2, expand=True, visible=False)
     
-    color_dropdown = Dropdown(
-        width=100,
-        options=[dropdown.Option(item) for item in df['text']],
-    )
-
-    color_dropdown2 = Dropdown(
-        width=100,
-        options=[],
-    )
-
-    color_dropdown3 = Dropdown(
-        width=100,
-        options=[],
-    )
-
-    color_dropdown4 = Dropdown(
-        width=100,
-        options=[],
-    )
-    out_text = Text()
-    out_text2 = Text()
-
     def get_category(e):
         category = color_dropdown.value
         idx = df.index[df['text'] == category].tolist()[0]
@@ -77,15 +54,20 @@ def main(page: Page):
         item_list = get_itemlist(href)
 
         color_dropdown3.options = [dropdown.Option(item) for item in item_list]
-
+        
+        quality_list = [1]
         _, df_all_history = process_history_data(
             item_list,
             royal_cities,
-            quality_list=[1],
+            quality_list,
             avg_days=14
         )
 
-        mydf.df_all_prices = get_prices_data(item_list, city_and_portals)
+        mydf.df_all_prices = process_prices_data(item_list,
+            royal_cities,
+            quality_list
+        )
+
         mydf.df_all = pd.merge(df_all_history, mydf.df_all_prices, how='outer')
         out_text.value = 'You can continue'
         page.update()
@@ -110,6 +92,31 @@ def main(page: Page):
         charts2.visible = True
         page.update()
 
+    color_dropdown = Dropdown(
+        on_change=get_category,
+        width=100,
+        options=[dropdown.Option(item) for item in df['text']],
+    )
+
+    color_dropdown2 = Dropdown(
+        on_change=get_item,
+        width=100,
+        options=[],
+    )
+
+    color_dropdown3 = Dropdown(
+        on_change=button_clicked,
+        width=100,
+        options=[],
+    )
+
+    color_dropdown4 = Dropdown(
+        on_change=button_clicked2,
+        width=100,
+        options=[],
+    )
+    out_text = Text()
+    out_text2 = Text()
 
     Row1 = Row(
         [
@@ -122,7 +129,6 @@ def main(page: Page):
                 width=150,
                 height=150,
                 border_radius=10,
-                on_click=get_category,
             ),
             Container(
                 content=color_dropdown2,
@@ -133,7 +139,6 @@ def main(page: Page):
                 width=150,
                 height=150,
                 border_radius=10,
-                on_click=get_item,
             ),
             Container(
                 content=color_dropdown3,
@@ -144,7 +149,6 @@ def main(page: Page):
                 width=150,
                 height=150,
                 border_radius=10,
-                on_click=button_clicked,
             ),
             Container(
                 content=color_dropdown4,
@@ -155,7 +159,6 @@ def main(page: Page):
                 width=150,
                 height=150,
                 border_radius=10,
-                on_click=button_clicked2,
             ),
         ],
         alignment="center",

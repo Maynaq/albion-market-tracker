@@ -105,29 +105,34 @@ def validate_history_data(df_raw, item, location_list, quality):
             df_empty = pd.concat([df_empty,
                 concat(bool_list, *[daily_data, weekly_data, monthly_data])]).reset_index(drop=True)
 
-    if len(df_empty) >= 100:     
-        q1 = df_empty.quantile(0.25)
-        q3 = df_empty.quantile(0.75)
-        iqr = q3 - q1
-        left_iqr = q1 - 1.7*iqr # q1 - 1.5*iqr
-        right_iqr = q3 + 1.7*iqr # q3 + 1.5*iqr
+    if len(df_empty) == 0:
+        print('no data on item {}'.format(item))
+        left_iqr = 0
+        right_iqr = 1e12
     else:
-        left_iqr = df_empty.median()/3
-        right_iqr = df_empty.median()*3
+        if len(df_empty) >= 100:     
+            q1 = df_empty.quantile(0.25)
+            q3 = df_empty.quantile(0.75)
+            iqr = q3 - q1
+            left_iqr = q1 - 1.7*iqr # q1 - 1.5*iqr
+            right_iqr = q3 + 1.7*iqr # q3 + 1.5*iqr
+        else:
+            left_iqr = df_empty.median()/3
+            right_iqr = df_empty.median()*3
 
 
-    d = np.array(df_empty)
-    num_of_valids = len(d[(d >= int(left_iqr)) & (d <= int(right_iqr))])
-    num_of_eliminated = len(d) - num_of_valids
-    percentage_of_eliminated =  100 * num_of_eliminated / len(d) 
-    print('for ' + item + ' with quality {} \n'.format(quality))
-    print('prices lower than {} and higher than {} are eliminated \n'.\
-        format(int(left_iqr), int(right_iqr)))
-    print('percentage of eliminated data: %{}\n'.format(percentage_of_eliminated))
-    print('max of data: {}\n'.format(np.max(d)))
-    print('min of data: {}\n'.format(np.min(d)))
-    print('median of data: {}\n'.format(np.median(d)))
-    print('-----------------------------------------')
+        d = np.array(df_empty)
+        num_of_valids = len(d[(d >= int(left_iqr)) & (d <= int(right_iqr))])
+        num_of_eliminated = len(d) - num_of_valids
+        percentage_of_eliminated =  100 * num_of_eliminated / len(d) 
+        print('for ' + item + ' with quality {} \n'.format(quality))
+        print('prices lower than {} and higher than {} are eliminated \n'.\
+            format(int(left_iqr), int(right_iqr)))
+        print('percentage of eliminated data: %{}\n'.format(percentage_of_eliminated))
+        print('max of data: {}\n'.format(np.max(d)))
+        print('min of data: {}\n'.format(np.min(d)))
+        print('median of data: {}\n'.format(np.median(d)))
+        print('-----------------------------------------')
     
     return left_iqr, right_iqr
 
@@ -245,23 +250,27 @@ def process_history_data(
                 temp_df = monthly_result_df.copy() 
                 temp_df = temp_df.loc[temp_df.timestamp + td(days=avg_days+1) > cur_time,:]
                 
-                df_to_data(
-                    df_all,
-                    np.round(temp_df.item_count.mean()),
-                    item,
-                    location,
-                    quality,
-                    data_key='avg_item_count'.format(avg_days)
-                )
-                df_to_data(
-                    df_all,
-                    np.round(np.sum(temp_df.item_count*temp_df.avg_price)
-                    /(np.sum(temp_df.item_count))),
-                    item,
-                    location,
-                    quality,
-                    data_key='avg_price'.format(avg_days)
-                )
+                # if temp_df empty
+                try:
+                    df_to_data(
+                        df_all,
+                        np.round(temp_df.item_count.mean()),
+                        item,
+                        location,
+                        quality,
+                        data_key='avg_item_count'.format(avg_days)
+                    )
+                    df_to_data(
+                        df_all,
+                        np.round(np.sum(temp_df.item_count*temp_df.avg_price)
+                        /(np.sum(temp_df.item_count))),
+                        item,
+                        location,
+                        quality,
+                        data_key='avg_price'.format(avg_days)
+                    )
+                except:
+                    print('no new data for {} on {}'.format(item,location))
                 
 
     

@@ -5,13 +5,18 @@ from datetime import datetime as dt
 
 from common.func_utils import *
 
-def get_prices_data(item_list: list, location_list: list) -> pd.DataFrame:
+def get_prices_data(item_list: list,
+    location_list: list,
+    quality_list: list
+) -> pd.DataFrame:
+    
     df = get_data(
         URL_NAME + 'prices' + '/',
         item_list,
-        locations = location_list
+        locations = location_list,
+        qualities = quality_list
     )
-    
+
     handle_df(df)
 
     return merge_portal_with_city_price(df, location_list)
@@ -57,3 +62,18 @@ def merge_portal_with_city_price(
 
     return merged_df
 
+def process_prices_data(
+        item_list: list,
+        location_list: list,
+        quality_list: list = [1]
+    ) -> tuple:
+    
+    city_and_portals = add_portals(location_list)
+
+    df = get_prices_data(
+        item_list,
+        city_and_portals,
+        quality_list
+    )
+    
+    return df
