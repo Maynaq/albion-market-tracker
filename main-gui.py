@@ -19,6 +19,11 @@ class MyDataframes:
         self.df_all = pd.DataFrame()
         self.df_all_prices = pd.DataFrame()
 
+class MyLists:
+    def __init__(self):
+        self.item_list = []
+        self.item_names = []
+
 matplotlib.use("svg")
 
 URL_NAME = "https://www.albion-online-data.com/api/v2/stats/"
@@ -32,6 +37,8 @@ def main(page: Page):
     page.window_maximized = True
 
     mydf = MyDataframes()
+    mylist = MyLists()
+
     fig, _ = plt.subplots()
     charts1 = MatplotlibChart(fig, expand=True, visible=False)
     fig2, _ = plt.subplots()
@@ -39,31 +46,33 @@ def main(page: Page):
     
     def get_category(e):
         category = color_dropdown.value
-        idx = df.index[df['text'] == category].tolist()[0]
-        mydf.df2 = pd.DataFrame(df.iloc[idx]['nodes'])
+        idx = mydf.df.index[mydf.df['text'] == category].tolist()[0]
+        mydf.df2 = pd.DataFrame(mydf.df.iloc[idx]['nodes'])
         color_dropdown2.options = [dropdown.Option(item) for item in mydf.df2['text']]
         print(mydf.df2)
         page.update()
 
     def get_item(e):
-        out_text.value = 'Wait for Processing'
+        out_text.value = 'Wait for Processing (takes up to 60 seconds)'
         page.update()
         subcategory = color_dropdown2.value
         idx = mydf.df2.index[mydf.df2['text'] == subcategory].tolist()[0]
         href = mydf.df2.iloc[idx]['href']
-        item_list = get_itemlist(href)
-
-        color_dropdown3.options = [dropdown.Option(item) for item in item_list]
+        mylist.item_list = get_itemlist(href)
+        mylist.item_names = get_item_names(mylist.item_list)
+        
+        color_dropdown3.options = [dropdown.Option(item) for item in mylist.item_names]
         
         quality_list = [1]
         _, df_all_history = process_history_data(
-            item_list,
+            mylist.item_list,
             royal_cities,
             quality_list,
             avg_days=14
         )
 
-        mydf.df_all_prices = process_prices_data(item_list,
+        mydf.df_all_prices = process_prices_data(
+            mylist.item_list,
             royal_cities,
             quality_list
         )
@@ -74,6 +83,8 @@ def main(page: Page):
 
     def button_clicked(e):
         item_name = color_dropdown3.value
+        idx = mylist.item_names.index(item_name)
+        item_name = mylist.item_list[idx]
         print(item_name)
         fig = plot_all_cities(mydf.df_all, item_name, royal_cities, quality=1, no_days=28)
         charts1.figure = fig
@@ -87,6 +98,9 @@ def main(page: Page):
     def button_clicked2(e):
         plot_city = color_dropdown4.value
         item_name = color_dropdown3.value
+        idx = mylist.item_names.index(item_name)
+        item_name = mylist.item_list[idx]
+
         fig2 = plot_one_city(mydf.df_all, item_name, plot_city, quality=1, no_days=14)
         charts2.figure = fig2
         charts2.visible = True
@@ -95,7 +109,7 @@ def main(page: Page):
     color_dropdown = Dropdown(
         on_change=get_category,
         width=100,
-        options=[dropdown.Option(item) for item in df['text']],
+        options=[dropdown.Option(item) for item in mydf.df['text']],
     )
 
     color_dropdown2 = Dropdown(
@@ -125,7 +139,6 @@ def main(page: Page):
                 margin=10,
                 padding=10,
                 alignment=alignment.center,
-                bgcolor=colors.AMBER,
                 width=150,
                 height=150,
                 border_radius=10,
@@ -135,7 +148,6 @@ def main(page: Page):
                 margin=10,
                 padding=10,
                 alignment=alignment.center,
-                bgcolor=colors.GREEN_200,
                 width=150,
                 height=150,
                 border_radius=10,
@@ -145,7 +157,6 @@ def main(page: Page):
                 margin=10,
                 padding=10,
                 alignment=alignment.center,
-                bgcolor=colors.BLUE_200,
                 width=150,
                 height=150,
                 border_radius=10,
@@ -155,7 +166,6 @@ def main(page: Page):
                 margin=10,
                 padding=10,
                 alignment=alignment.center,
-                bgcolor=colors.BLUE_200,
                 width=150,
                 height=150,
                 border_radius=10,
