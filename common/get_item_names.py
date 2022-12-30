@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 import pandas as pd
 
 albion_url = 'https://www.albiononline2d.com'
-common_tags = ['Uncommon, Rare, Exceptional, Pristine']
+common_tags = ['Uncommon', 'Rare', 'Exceptional', 'Pristine']
 common_tags2 = ['Adept\'s', 'Expert\'s', 'Master\'s', 'Grandmaster\'s', 'Elder\'s']
 
 def get_itemlist(href: str) -> list:
@@ -47,7 +47,7 @@ def get_item_names(item_list: list) -> list:
     for item in item_list:
         df = all_items[all_items['UniqueName']==item]
         item_name = df['LocalizedNames'].item()['EN-US']
-        for tags in common_tags + common_tags2:
+        for tags in (common_tags + common_tags2):
             item_name = item_name.replace(tags, '')
         if item[-2] != '@':
             item_name = item[:2] + '.0' + item_name
