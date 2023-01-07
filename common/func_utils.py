@@ -106,8 +106,8 @@ def add_portals(city_list: list) -> list:
     """
     city_list_modified = city_list.copy()
     for city in city_list:
-        assert city in ROYAL_CITIES, 'city is not a royal city'
-        city_list_modified.append(city + ' Portal')
+        if city in ROYAL_CITIES:
+            city_list_modified.append(city + ' Portal')
     return city_list_modified
 
 def get_data_index(

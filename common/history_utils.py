@@ -192,7 +192,7 @@ def process_history_data(
 
     for item in item_list:
         for quality in quality_list:
-            if not quality in df_all['quality'].to_numpy():
+            if not quality in df_all['quality'].unique():
                 continue
             left_iqr, right_iqr = validate_history_data(df_raw,
             item, location_list, quality)
@@ -246,31 +246,25 @@ def process_history_data(
                         data_key='monthly_data'
                     )   
 
-                cur_time = dt.utcnow()
-                temp_df = monthly_result_df.copy() 
-                temp_df = temp_df.loc[temp_df.timestamp + td(days=avg_days+1) > cur_time,:]
+                    cur_time = dt.utcnow()
+                    temp_df = monthly_result_df.copy()
+                    if temp_df.empty:
+                        df_all.drop([idx],inplace=True)
+                        df_all.reset_index(drop=True,inplace=True)
+                        continue
+                    temp_df = temp_df.loc[temp_df.timestamp + td(days=avg_days+1) > cur_time,:]
                 
-                # if temp_df empty
-                try:
-                    df_to_data(
-                        df_all,
-                        np.round(temp_df.item_count.mean()),
-                        item,
-                        location,
-                        quality,
-                        data_key='avg_item_count'.format(avg_days)
-                    )
-                    df_to_data(
-                        df_all,
-                        np.round(np.sum(temp_df.item_count*temp_df.avg_price)
-                        /(np.sum(temp_df.item_count))),
-                        item,
-                        location,
-                        quality,
-                        data_key='avg_price'.format(avg_days)
-                    )
-                except:
-                    print('no new data for {} on {}'.format(item,location))
+                    if not temp_df.empty:
+                        data_key = 'avg_item_count'.format(avg_days)
+                        data = np.round(temp_df.item_count.mean())
+                        df_all.at[idx, data_key] = data
+
+                        data_key = 'avg_price'.format(avg_days)
+                        data = np.sum(temp_df.item_count*temp_df.avg_price)\
+                            /(np.sum(temp_df.item_count))
+                        df_all.at[idx, data_key] = int(data)
+                    else:
+                        print('no new data for {} on {}'.format(item,location))
                 
 
     

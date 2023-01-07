@@ -28,7 +28,7 @@ matplotlib.use("svg")
 
 URL_NAME = "https://www.albion-online-data.com/api/v2/stats/"
 
-royal_cities = ['Thetford', 'Lymhurst', 'Bridgewatch', 'Martlock', 'Fort Sterling']
+royal_cities = ['Thetford', 'Lymhurst', 'Bridgewatch', 'Martlock', 'Fort Sterling', 'Caerleon', 'Black Market']
 
 def main(page: Page):
     page.title = "Albion Market Prices"
@@ -77,7 +77,7 @@ def main(page: Page):
             quality_list
         )
 
-        mydf.df_all = pd.merge(df_all_history, mydf.df_all_prices, how='outer')
+        mydf.df_all = pd.merge(df_all_history, mydf.df_all_prices, how='left')
         out_text.value = 'You can continue'
         page.update()
 
@@ -86,13 +86,14 @@ def main(page: Page):
         idx = mylist.item_names.index(item_name)
         item_name = mylist.item_list[idx]
         print(item_name)
+        plt.close()
         fig = plot_all_cities(mydf.df_all, item_name, royal_cities, quality=1, no_days=28)
         charts1.figure = fig
         charts1.visible = True
         out_text.value = 'Wait for new Resource type'
         out_text2.value = str(mydf.df_all_prices[mydf.df_all_prices['item_id']==item_name])
         color_dropdown4.options = [dropdown.Option(item) for item in royal_cities]
-
+        
         page.update()
 
     def button_clicked2(e):
@@ -100,7 +101,7 @@ def main(page: Page):
         item_name = color_dropdown3.value
         idx = mylist.item_names.index(item_name)
         item_name = mylist.item_list[idx]
-
+        plt.close()
         fig2 = plot_one_city(mydf.df_all, item_name, plot_city, quality=1, no_days=14)
         charts2.figure = fig2
         charts2.visible = True

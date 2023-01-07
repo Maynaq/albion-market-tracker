@@ -4,6 +4,8 @@ from datetime import datetime as dt, timedelta as td
 from common.func_utils import *
 from matplotlib.legend_handler import HandlerTuple
 
+# TO-DO prices data messes up the graph
+# Do something for no data
 def plot_one_city(
     df_all: pd.DataFrame,
     item: str,
@@ -12,65 +14,14 @@ def plot_one_city(
     no_days: int = 7
 ) -> None:
 
-    cur_time = dt.utcnow()
-    compare_time = cur_time-td(days=no_days)-td(hours=(cur_time-td(days=no_days)).hour+1)
-
-    idx = get_data_index(df_all, item, city, quality)
-
-    daily_df = df_all.loc[idx,:]['daily_data']
-    daily_df = daily_df.loc[daily_df.timestamp > compare_time,:]
-
-    weekly_df = df_all.loc[idx,:]['weekly_data']
-    weekly_df = weekly_df.loc[weekly_df.timestamp > compare_time,:]
-
-    monthly_df = df_all.loc[idx,:]['monthly_data']
-    monthly_df = monthly_df.loc[monthly_df.timestamp > compare_time,:]
-
-    monthly_df['timestamp'] = monthly_df['timestamp']
     fig,ax = plt.subplots()
-    # make a plot
-    ax.plot(
-        daily_df.timestamp,
-        daily_df.avg_price,
-        color="blue", 
-        marker=".",
-        linewidth=1,
-        alpha=0.25,
-        label='daily'
-    )
 
-    ax.plot(
-        weekly_df.timestamp,
-        weekly_df.avg_price,
-        color="red", 
-        marker="x",
-        linewidth=2,
-        alpha=0.5, 
-        label='weekly'
-    )
-
-    ax.plot(
-        monthly_df.timestamp,
-        monthly_df.avg_price,
-        color="green", 
-        marker="o",
-        linewidth=4,
-        label='monthly'
-    )
     # set x-axis label
     ax.set_xlabel("timestamps", fontsize=14)
     # set y-axis label
     ax.set_ylabel("avg_price",color="red",fontsize=14)
-    ax.legend()
     # twin object for two different y-axis on the sample plot
     ax2 = ax.twinx()
-    # make a plot with different y-axis using second axis object
-    ax2.bar(
-        monthly_df.timestamp,
-        monthly_df.item_count,
-        color="green",
-        alpha=0.2
-    )
 
     if quality == 1:
         quality_name = 'Normal'
@@ -82,9 +33,67 @@ def plot_one_city(
         quality_name = 'Excellent'
     elif quality == 5:
         quality_name = 'Masterpiece'
+        
     ax2.set_ylabel("item count", color="blue", fontsize=14)
+
     plt.title(item + ' ' + quality_name + ' quality at ' + city)
-    plt.show(block=False)
+
+    cur_time = dt.utcnow()
+    compare_time = cur_time-td(days=no_days)-td(hours=(cur_time-td(days=no_days)).hour+1)
+
+    idx = get_data_index(df_all, item, city, quality)
+    if idx is not None:
+        daily_df = df_all.loc[idx,:]['daily_data']
+        daily_df = daily_df.loc[daily_df.timestamp > compare_time,:]
+
+        weekly_df = df_all.loc[idx,:]['weekly_data']
+        weekly_df = weekly_df.loc[weekly_df.timestamp > compare_time,:]
+
+        monthly_df = df_all.loc[idx,:]['monthly_data']
+        monthly_df = monthly_df.loc[monthly_df.timestamp > compare_time,:]
+
+        monthly_df['timestamp'] = monthly_df['timestamp']
+
+        # make a plot
+        ax.plot(
+            daily_df.timestamp,
+            daily_df.avg_price,
+            color="blue", 
+            marker=".",
+            linewidth=1,
+            alpha=0.25,
+            label='daily'
+        )
+
+        ax.plot(
+            weekly_df.timestamp,
+            weekly_df.avg_price,
+            color="red", 
+            marker="x",
+            linewidth=2,
+            alpha=0.5, 
+            label='weekly'
+        )
+
+        ax.plot(
+            monthly_df.timestamp,
+            monthly_df.avg_price,
+            color="green", 
+            marker="o",
+            linewidth=4,
+            label='monthly'
+        )
+
+        # make a plot with different y-axis using second axis object
+        ax2.bar(
+            monthly_df.timestamp,
+            monthly_df.item_count,
+            color="green",
+            alpha=0.2
+        )
+
+    # plt.show(block=False)
+        ax.legend()
 
     return fig
 
@@ -107,9 +116,6 @@ def plot_all_cities(
     # twin object for two different y-axis on the sample plot
     ax2 = ax.twinx()
     ax2.set_ylabel("item count", color="blue", fontsize=14)
-
-    tuple_list = []
-    tuple_list2 = []
 
     cur_time = dt.utcnow()
     compare_time = cur_time-td(days=no_days)-td(hours=(cur_time-td(days=no_days)).hour+1)
@@ -166,9 +172,7 @@ def plot_all_cities(
                 s=250,
                 label=city
             )
-        
-            tuple_list.append(p1)
-            tuple_list2.append(p4)
+
         except Exception as e:
             print(e)
 
