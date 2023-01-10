@@ -245,6 +245,13 @@ def process_history_data(
                         right_iqr,
                         data_key='monthly_data'
                     )   
+                    data_key = 'left_iqr'
+                    data = int(left_iqr)
+                    df_all.at[idx, data_key] = data
+                    
+                    data_key = 'right_iqr'
+                    data = int(right_iqr)
+                    df_all.at[idx, data_key] = data
 
                     cur_time = dt.utcnow()
                     temp_df = monthly_result_df.copy()

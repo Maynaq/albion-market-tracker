@@ -2,7 +2,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime as dt, timedelta as td
 from common.func_utils import *
-from matplotlib.legend_handler import HandlerTuple
 
 # TO-DO prices data messes up the graph
 # Do something for no data
@@ -11,7 +10,8 @@ def plot_one_city(
     item: str,
     city: str,
     quality: int = 1,
-    no_days: int = 7
+    no_days: int = 7,
+    show: bool = False
 ) -> None:
 
     fig,ax = plt.subplots()
@@ -91,9 +91,10 @@ def plot_one_city(
             color="green",
             alpha=0.2
         )
-
-    # plt.show(block=False)
         ax.legend()
+
+    if show:
+        plt.show(block=False)
 
     return fig
 
@@ -102,7 +103,8 @@ def plot_all_cities(
     item: str,
     royal_cities: list,
     quality: int = 1,
-    no_days: int = 7
+    no_days: int = 7,
+    show=False
 ) -> None:
 
     fig,ax = plt.subplots()
@@ -124,13 +126,14 @@ def plot_all_cities(
         if idx is None:
             continue
         df = df_all.loc[idx]
+
         weekly_df = df['weekly_data']
         weekly_df = weekly_df.loc[weekly_df.timestamp > compare_time,:]
         
         monthly_df = df['monthly_data']
         monthly_df = monthly_df.loc[monthly_df.timestamp > compare_time,:]
         monthly_df['timestamp'] = monthly_df['timestamp']
-    
+
         try:
             # make a plot
             color = next(ax._get_lines.prop_cycler)['color']
@@ -207,6 +210,9 @@ def plot_all_cities(
         quality_name = 'Masterpiece'
     
     plt.title('{} days of '.format(no_days) + item + ' ' + quality_name + ' quality')
-    # plt.show(block=False)
+    
+    if show:
+        plt.show(block=False)
+
     return fig
 

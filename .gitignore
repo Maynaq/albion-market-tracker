@@ -2,3 +2,8 @@
 __pycache__
 venv
 test
+exe_venv
+dist
+build
+*.spec
+items

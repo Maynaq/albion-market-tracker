@@ -1,5 +1,5 @@
 import requests
-
+import os
 import re
 import json
 from bs4 import BeautifulSoup
@@ -81,9 +81,10 @@ def update_item_list():
     df.to_json('items\items.json', orient='records')
     return df
 
-
-update_categories()
-update_item_list()
+if not os.path.isdir('items'):
+    os.mkdir('items')
+    update_categories()
+    update_item_list()
 # saves file
 
 # df2 = pd.read_json('items\item_categories.json')

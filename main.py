@@ -35,11 +35,10 @@ df_raw_history, df_all_history = process_history_data(
     avg_days=14
 )
 
-city_and_portals = add_portals(royal_cities)
-df_all_prices = get_prices_data(item_name, city_and_portals)
+df_all_prices = get_prices_data(item_name, royal_cities, quality_list=[1])
 
-df_all = pd.merge(df_all_history, df_all_prices, how='outer')
-plot_all_cities(df_all, item_name[0], royal_cities, quality=1, no_days=28)
+df_all = merger_hist_price(df_all_history, df_all_prices)
+plot_all_cities(df_all, item_name[0], royal_cities, quality=1, no_days=28, show=True)
 
 while 1:
     plot_city = int(input('Enter the id (1: Thetford, 2: Lymhurst, 3: Bridgewatch, 4: Martlock, 5: Fort Sterling, 0: Exit): '))
@@ -51,7 +50,7 @@ while 1:
     else:
         print('Try again')
         continue
-    plot_one_city(df_all, item_name[0], royal_cities[plot_city], quality=1, no_days=14)
+    plot_one_city(df_all, item_name[0], royal_cities[plot_city], quality=1, no_days=14, show=True)
 
 breakpointt = 1
 

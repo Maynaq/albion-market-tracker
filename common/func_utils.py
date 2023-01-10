@@ -159,3 +159,8 @@ def df_to_data(
     if idx is not None:
         df.at[idx, data_key] = data.copy()
 
+def merger_hist_price(df_history, df_prices):
+    df_all = pd.merge(df_history, df_prices, how='left')
+    df_all.loc[df_all['left_iqr'] > df_all['price'],'price'] = np.nan
+    df_all.loc[df_all['right_iqr'] < df_all['price'],'price'] = np.nan
+    return df_all

@@ -76,8 +76,8 @@ def main(page: Page):
             royal_cities,
             quality_list
         )
+        mydf.df_all = merger_hist_price(df_all_history, mydf.df_all_prices)
 
-        mydf.df_all = pd.merge(df_all_history, mydf.df_all_prices, how='left')
         out_text.value = 'You can continue'
         page.update()
 
@@ -217,13 +217,13 @@ def main(page: Page):
                 padding=10,
                 alignment=alignment.center,
                 width=600,
-                height=150,
+                height=250,
                 border_radius=10,
             ),
         ],
         alignment="center"
     )
 
-    page.add(Column([Row1, Row2, Row3]))         
+    page.add(Column([Row1, Row2, Row3], alignment="start", scroll='auto'))         
 
 flet.app(target=main)
